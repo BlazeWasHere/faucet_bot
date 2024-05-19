@@ -14,18 +14,19 @@ jobs:
           path: deps
           key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
           restore-keys: ${{ runner.os }}-mix-
-      - name: Check formatting
-        run: mix format --check-formatted
-      - name: Check code style
-        run: mix credo --strict
       - name: Init secrets file
         run: |
           cp config/secrets-example.exs config/secrets.exs
           sed -i -e 's/private_key: ""/private_key: "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d"/g' config/secrets.exs
+          mix format config/secrets.exs
       - name: Install Dependencies
         run: |
           mix local.rebar --force
           mix local.hex --force
           mix deps.get
+      - name: Check formatting
+        run: mix format --check-formatted
+      - name: Check code style
+        run: mix credo --strict
       - name: Run tests
         run: mix test --no-start
